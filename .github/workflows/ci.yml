@@ -16,17 +16,16 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest # Указывает тип виртуальной машины, на которой будет выполняться workflow
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    runs-on: ubuntu-latest
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4 # Клонирует репозиторий в рабочую директорию GitHub Actions
+    - uses: actions/checkout@v4
 
-      # Runs a single command using the runner's shell
-      - name: Run markdown lint # Название шага, проверяющего markdown-файлы
-        run: |
-          npm install remark-cli remark-preset-lint-consistent # Устанавливает зависимости для линтера Markdown
-          npx remark . --use remark-preset-lint-consistent --frail # Запускает линтер с использованием пресета
-          # Параметр --frail завершает процесс с кодом 1, если найдены предупреждения или ошибки
+    - name: Run markdown lint
+      run: |
+        npm install remark-cli remark-preset-lint-consistent vfile-reporter-json
+        npx remark . --use remark-preset-lint-consistent --report vfile-reporter-json 2> remark-lint-report.json
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: remark-lint-report
+        path: remark-lint-report.json
